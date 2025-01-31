@@ -1,31 +1,19 @@
-from flask import Flask, jsonify, request
-
-import os
-import google.generativeai as genai
+from flask import Flask, jsonify, request, Response, stream_with_context
+import openai
+from openai import OpenAI
 import json
 from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
 load_dotenv()
 
-if(os.getenv("AI_instructions") == None):
-    print("No AI instructions found in .env file. Please add AI_instructions variable with the instructions provided by the AI team.")
-    exit()
+# prevent caching
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-generation_config = {
-  "temperature": 1,
-  "top_p": 0.95,
-  "top_k": 40,
-  "max_output_tokens": 8192,
-  "response_mime_type": "text/plain",
-}
-
-model = genai.GenerativeModel(
-  model_name="gemini-2.0-flash-exp",
-  generation_config=generation_config,
-  system_instruction=os.getenv("AI_instructions") or None,
-)
+if os.getenv("AI_instructions") is None:
+    print("No AI instructions found in .env file. Please add AI_instructions if you want to edit AI instructions.")
 
 @app.route("/")
 def home():
@@ -33,47 +21,88 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
+
     data = request.get_json()
-    # expects keys: api_key, message, history
+
     if "api_key" not in data or "message" not in data or "history" not in data:
         return jsonify({"error": "Invalid request data"}), 400
-    # api_key must be string
-    if not isinstance(data["api_key"], str):
-        return jsonify({"error": "Invalid request data"}), 400
-    # message must be string
+
+    api_key = data.get('api_key', "")
+
+    if not isinstance(api_key, str):
+        return jsonify({"error": "API key must be a string"}), 400
+    
     if not isinstance(data["message"], str):
         return jsonify({"error": "Invalid request data"}), 400
-    # history must be JSON object formatted like:
-    #    [{
-    #      "role": "user",
-    #      "parts": [
-    #        "",
-    #      ],
-    # }
-    # ]
+    
     if not isinstance(data["history"], list):
         return jsonify({"error": "Invalid request data"}), 400
+    # history must be formatted [{"role":"users/system", "message":"message"}]
     for item in data["history"]:
-        if "role" not in item or "parts" not in item:
+        if not isinstance(item, dict):
             return jsonify({"error": "Invalid request data"}), 400
-        if not isinstance(item["role"], str) or not isinstance(item["parts"], list):
+        if "role" not in item or "message" not in item:
             return jsonify({"error": "Invalid request data"}), 400
-        for part in item["parts"]:
-            if not isinstance(part, str):
-                return jsonify({"error": "Invalid request data"}), 400
-    genai.configure(api_key=data["api_key"])
-    chat_session = model.start_chat(history=data["history"])
-    try:
-        response = chat_session.send_message(data["message"])
-        dict = json.dumps(response.to_dict()['candidates'][0]["content"])
+        if not isinstance(item["role"], str) or not isinstance(item["message"], str):
+            return jsonify({"error": "Invalid request data"}), 400
+        if(item["role"] != "user" and item["role"] != "system"):
+            return jsonify({"error": "Invalid request data"}), 400
+    
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    )
 
-        return dict
-    except Exception as e:
-        # Capture the exception and check if it is an API Key error
-        if "API_KEY_INVALID" in str(e):
-            return jsonify({"error": "Invalid API key"}), 403
-        else:
-            return jsonify({"error":"unknown","error_log": str(e)}), 500
+
+    def generate():
+        data = request.json
+        msg = data.get('message', '')
+        chat_history = data.get('history', [])
+
+        # Prepare message format
+        messages = [{"role": "system", "content": os.getenv("AI_instructions") or "You are a helpful assistant."}]
+        for item in chat_history:
+            messages.append({"role": item["role"], "content": item["message"]})
+
+        messages.append({"role": "user", "content": msg})
+
+        try:
+            response = client.chat.completions.create(
+                model="gemini-2.0-flash-exp",
+                messages=messages,
+                stream=True
+            )
+            for chunk in response:
+                if(chunk.choices[0].delta.content != None): #OpenAI returns None for last chunk for some reason
+                    yield chunk.choices[0].delta.content
+        except openai.APIConnectionError as e:
+            yield "The server could not be reached"
+        except openai.RateLimitError as e:
+            yield "A 429 status code was received; we should back off a bit."
+        except openai.BadRequestError as e:
+            error = str(e)
+            #take error and split it from " - "
+            error = error.split(" - ")
+            error = error[1]
+            error = error.replace("'", "\"")
+            try:
+                error = json.loads(error)
+                try:
+                    if "details" in error[0]["error"] and len(error[0]["error"]["details"]) > 1:
+                        yield error[0]["error"]["details"][1]["message"]
+                    elif "message" in error[0]["error"]:
+                        yield error[0]["error"]["message"]
+                    else:
+                        yield "An unknown error occurred"
+                except Exception as e:
+                    yield "An unknown error occurred"
+            except Exception as e:
+                yield "An unknown error occurred"
+        except Exception as e:  # Catches any other general errors
+            print(f"Exception: {e.error}")
+            yield f"AN UNKNOWN ERROR OCCURRED"
+
+    return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
 @app.route("/chat", methods=["GET"])
 def chat_fail():
