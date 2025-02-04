@@ -4,16 +4,32 @@ from openai import OpenAI
 import json
 from dotenv import load_dotenv
 import os
+# import CORS
+from flask_cors import CORS
+
+# allow requests from any origin
+
 
 app = Flask(__name__)
 
 load_dotenv()
 
+if os.environ.get("production") == "false":
+    CORS(app) # allow requests from any origin
+
 # prevent caching
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-if os.getenv("AI_instructions") is None:
-    print("No AI instructions found in .env file. Please add AI_instructions if you want to edit AI instructions.")
+# load instructions.txt 
+AI_instructions = ""
+instructions_path = "instructions.txt"
+
+if os.path.exists(instructions_path):
+    with open(instructions_path, "r") as file:
+        AI_instructions = file.read()
+    print(AI_instructions)
+else:
+    print("No AI instructions file. found Please add create a instructions.txt if you want to edit AI instructions.")
 
 @app.route("/")
 def home():
@@ -25,7 +41,7 @@ def chat():
     data = request.get_json()
 
     if "api_key" not in data or "message" not in data or "history" not in data:
-        return jsonify({"error": "Invalid request data"}), 400
+        return jsonify({"error": "Invalid request data (ID: 1)"}), 400
 
     api_key = data.get('api_key', "")
 
@@ -33,20 +49,20 @@ def chat():
         return jsonify({"error": "API key must be a string"}), 400
     
     if not isinstance(data["message"], str):
-        return jsonify({"error": "Invalid request data"}), 400
+        return jsonify({"error": "Invalid request data (ID: 2)"}), 400
     
     if not isinstance(data["history"], list):
-        return jsonify({"error": "Invalid request data"}), 400
+        return jsonify({"error": "Invalid request data (ID: 3)"}), 400
     # history must be formatted [{"role":"users/system", "message":"message"}]
     for item in data["history"]:
         if not isinstance(item, dict):
-            return jsonify({"error": "Invalid request data"}), 400
+            return jsonify({"error": "Invalid request data (ID: 4)"}), 400
         if "role" not in item or "message" not in item:
-            return jsonify({"error": "Invalid request data"}), 400
+            return jsonify({"error": "Invalid request data (ID: 5)"}), 400
         if not isinstance(item["role"], str) or not isinstance(item["message"], str):
-            return jsonify({"error": "Invalid request data"}), 400
-        if(item["role"] != "user" and item["role"] != "system"):
-            return jsonify({"error": "Invalid request data"}), 400
+            return jsonify({"error": "Invalid request data (ID: 6)"}), 400
+        if(item["role"] != "user" and item["role"] != "assistant"):
+            return jsonify({"error": "Invalid request data (ID: 7)"}), 400
     
     client = OpenAI(
         api_key=api_key,
@@ -60,7 +76,7 @@ def chat():
         chat_history = data.get('history', [])
 
         # Prepare message format
-        messages = [{"role": "system", "content": os.getenv("AI_instructions") or "You are a helpful assistant."}]
+        messages = [{"role": "system", "content": AI_instructions or "You are a helpful assistant."}]
         for item in chat_history:
             messages.append({"role": item["role"], "content": item["message"]})
 
@@ -93,14 +109,17 @@ def chat():
                     elif "message" in error[0]["error"]:
                         yield error[0]["error"]["message"]
                     else:
-                        yield "An unknown error occurred"
+                        yield "An unknown error occurred (ID: 1)"
+                    print(f"Error: {e}")
                 except Exception as e:
-                    yield "An unknown error occurred"
+                    yield "An unknown error occurred (ID: 2)"
+                    print(f"Exception: {e}")
             except Exception as e:
-                yield "An unknown error occurred"
+                yield "An unknown error occurred (ID: 3)"
+                print(f"Exception: {e}")
         except Exception as e:  # Catches any other general errors
-            print(f"Exception: {e.error}")
-            yield f"AN UNKNOWN ERROR OCCURRED"
+            yield f"AN UNKNOWN ERROR OCCURRED (ID: 4)"
+            print(f"Exception: {e}")
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
