@@ -84,7 +84,7 @@ def chat():
 
         try:
             response = client.chat.completions.create(
-                model="gemini-2.0-flash-exp",
+                model="gemini-2.0-flash",#gemini-2.0-flash-exp,
                 messages=messages,
                 stream=True
             )
