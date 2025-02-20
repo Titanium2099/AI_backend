@@ -127,5 +127,9 @@ def chat():
 def chat_fail():
     return jsonify({"error": "Incorrect request method"}), 405
 
+@app.route("/main.css", methods=["GET"])
+def css():
+    return app.send_static_file("main.css")
+
 if __name__ == "__main__":
     app.run(debug=True)

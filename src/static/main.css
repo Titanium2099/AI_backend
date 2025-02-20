@@ -1,0 +1,345 @@
+* {
+    font-family: "Helvetica Neue", sans-serif;
+}
+
+.container {
+    width: 450px;
+    height: 300px;
+    border: 1px solid var(--ui-tertiary);
+    border-radius: 6px;
+    background-color: var(--ui-primary);
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.ai-message {
+    max-width: 337.5px;
+    font-size: 11px;
+    margin-top: 10px;
+    width: fit-content;
+    /*min-width: 110px;*/
+}
+
+.ai-message .message {
+    color: #7C7766;
+    font-family: "Helvetica Neue", sans-serif;
+    border: 1px solid var(--ui-tertiary);
+    padding: 10px;
+    margin: 0px;
+    margin-left: 10px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.user-message {
+    font-size: 11px;
+    display: flex;
+    max-width: 100%;
+    margin-top: 10px;
+}
+
+.user-message .message {
+    color: #7C7766;
+    font-family: "Helvetica Neue", sans-serif;
+    border: 1px solid var(--ui-tertiary);
+    padding: 10px;
+    border-radius: 10px;
+    margin: 0px;
+    margin-left: auto;
+    margin-right: 10px;
+    max-width: 250px;
+    font-size: 11px;
+    /*min-width: 78px;*/
+}
+
+.input-container {
+    min-height: 20px;
+    border: 1px solid var(--ui-tertiary);
+    margin: 10px;
+    border-radius: 6px;
+    display: flex;
+    padding: 7.5px;
+    min-height:fit-content;flex-direction:column;
+}
+.input-container .input-parent{
+    width:100%;display:flex
+}
+.ai-message .message *:not(svg):not(svg *) {
+    font-size: 11px;
+}
+
+.ai .message h1 {
+    font-size: 14px;
+}
+
+.input-field {
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    color: #7C7766;
+    margin-left: 8px;
+    font-size: 11px;
+    width: 100%;
+    font-weight: 500;
+    font-family: "Helvetica Neue", sans-serif;
+    outline: none;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+    margin-right: 11px;
+    max-height: 157px;
+    position: relative;
+    top: 2px;
+    resize:none;min-height:20px;height:20px;top:2px;
+}
+
+.send-icon {
+    cursor: pointer;
+}
+
+.dot-elastic {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 5px;
+    background-color: #7C7766;
+    color: #7C7766;
+    animation: dot-elastic 1s infinite linear;
+    margin-left: auto;margin-right: auto;
+}
+
+.dot-elastic::before,
+.dot-elastic::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 0;
+}
+
+.dot-elastic::before {
+    left: -10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 5px;
+    background-color: #7C7766;
+    color: #7C7766;
+    animation: dot-elastic-before 1s infinite linear;
+}
+
+.dot-elastic::after {
+    left: 10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 5px;
+    background-color: #7C7766;
+    color: #7C7766;
+    animation: dot-elastic-after 1s infinite linear;
+}
+
+@keyframes dot-elastic-before {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    25% {
+        transform: scale(1, 1.5);
+    }
+
+    50% {
+        transform: scale(1, 0.67);
+    }
+
+    75% {
+        transform: scale(1, 1);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+@keyframes dot-elastic {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    25% {
+        transform: scale(1, 1);
+    }
+
+    50% {
+        transform: scale(1, 1.5);
+    }
+
+    75% {
+        transform: scale(1, 1);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+@keyframes dot-elastic-after {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    25% {
+        transform: scale(1, 1);
+    }
+
+    50% {
+        transform: scale(1, 0.67);
+    }
+
+    75% {
+        transform: scale(1, 1.5);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+.codeChunkOverlay {
+    border: 1px solid var(--ui-tertiary);
+    padding: 5px;
+    padding-top: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    border-radius: 6px;
+    overflow: auto;
+}
+
+.attachedFile {
+    border: 1px solid var(--ui-tertiary);
+    border-radius: 6px;
+    overflow: auto;
+    display: flex;
+    margin-top: 10px;
+    padding: 5px;
+    width: fit-content
+}
+
+.attachedFile .svg {
+    height: 16px;
+    color: #87bcde
+}
+
+.attachedFile .texta {
+    margin: 0;
+    margin-right: 5px;
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 11px;
+    color: #7b7665
+}
+
+.attachedFile .svg2 {
+    height: 13px;
+    color: var(--text-primary);
+    margin-top: auto;
+    margin-bottom: auto;
+    cursor: pointer
+}
+
+.headerT {
+    padding: 5px;
+    display: flex;
+}
+
+#clearChat {
+    height: 19px;
+    color: var(--text-primary);
+    margin-top: auto;
+    margin-bottom: auto;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+#closePopup {
+    height: 19px;
+    color: var(--text-primary);
+    margin-top: auto;
+    margin-bottom: auto;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.errorMessage {
+    color: #d0402e;
+}
+
+.Popup_Header{
+    display:flex;flex-direction:column;margin-top:10px
+}
+.Popup_Header .a{
+    width:79px;height:79px;margin-left:auto;margin-right:auto;margin-bottom:5px
+}
+.Popup_Header .b{
+    text-align:center;color:#7c7766;font-weight:900;z-index:10;user-select:none;pointer-events:none 
+}
+.FileAttachment {
+    border: 1px solid var(--ui-tertiary);
+    border-radius: 6px;
+    overflow: auto;
+    display: flex;
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.FileAttachment .svg {
+    height: 16px;
+    color: #87BCDE;
+}
+
+.FileAttachment .p {
+    margin: 0px;
+    margin-right: 5px;
+    font-size: 11px;
+}
+
+.no_api_key{
+    display: flex;flex-direction: column; 
+}
+.no_api_key .a{
+    padding: 5px;display: flex;
+}
+
+.no_api_key .b{
+    display:flex;flex-direction:column;margin:auto;
+}
+.no_api_key .c{
+    width:79px;height:79px;margin-left:auto;margin-right:auto;margin-bottom:5px
+}
+.no_api_key .d{
+    text-align:center;color:#7c7766;font-weight:900;z-index:10;user-select:none;pointer-events:none;width: 300px;margin-left: auto;margin-right: auto;
+}
+.animated-text {
+    background: linear-gradient(to right, var(--ui-tertiary) 20%, #635f52 40%, #635f52 60%, #393a3a 80%);
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-animation: 2s linear infinite shine;
+    animation: 2s linear infinite shine
+}
+
+@-webkit-keyframes shine {
+    to {
+        background-position: 200% center
+    }
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center
+    }
+}
