@@ -383,8 +383,20 @@
 	box-shadow: 0 0 15px var(--ui-primary);
 }
 
+.animated-text-light{
+    background: linear-gradient(to right, #7C7766 20%, #bdbdbd 40%, #bdbdbd 60%, #7C7766 80%);
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-animation: 2s linear infinite shine;
+    animation: 2s linear infinite shine
+}
+
 .animated-text {
-    background: linear-gradient(to right, var(--ui-tertiary) 20%, #635f52 40%, #635f52 60%, #393a3a 80%);
+    background: linear-gradient(to right, var(--ui-tertiary) 20%, #635f52 40%, #635f52 60%, var(--ui-tertiary) 80%);
     background-size: 200% auto;
     color: #000;
     background-clip: text;
