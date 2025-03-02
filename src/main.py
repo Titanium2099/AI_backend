@@ -85,6 +85,7 @@ def chat():
         try:
             response = client.chat.completions.create(
                 model="gemini-2.0-flash",#gemini-2.0-flash-exp,
+                #model="gemini-2.0-pro-exp-02-05",
                 messages=messages,
                 stream=True
             )
@@ -127,9 +128,14 @@ def chat():
 def chat_fail():
     return jsonify({"error": "Incorrect request method"}), 405
 
-@app.route("/main.css", methods=["GET"])
-def css():
-    return app.send_static_file("main.css")
+#@app.route("/main.css", methods=["GET"])
+#def css():
+#    return app.send_static_file("main.css")
+
+# route all static files
+@app.route("/<path:path>", methods=["GET"])
+def static_files(path):
+    return app.send_static_file(path)
 
 if __name__ == "__main__":
     app.run(debug=True)
