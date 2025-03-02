@@ -84,8 +84,8 @@ def chat():
 
         try:
             response = client.chat.completions.create(
-                model="gemini-2.0-flash",#gemini-2.0-flash-exp,
-                #model="gemini-2.0-pro-exp-02-05",
+                #model="gemini-2.0-flash",#gemini-2.0-flash-exp,
+                model="gemini-2.0-pro-exp-02-05",
                 messages=messages,
                 stream=True
             )
@@ -95,7 +95,7 @@ def chat():
         except openai.APIConnectionError as e:
             yield "The server could not be reached"
         except openai.RateLimitError as e:
-            yield "A 429 status code was received; we should back off a bit."
+            yield "You are being rate-limited (try again in a bit)"
         except openai.BadRequestError as e:
             error = str(e)
             #take error and split it from " - "
