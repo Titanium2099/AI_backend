@@ -24,6 +24,20 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 AI_instructions = ""
 instructions_path = "instructions.txt"
 
+
+AI_models = [
+    {
+        "display_name": "Gemini 2.0 Pro",
+        "id": "gemini-2.0-pro-exp-02-05",
+    },
+    {
+        "display_name": "Gemini 2.0 Flash",
+        "id": "gemini-2.0-flash",
+        "default": True
+    }
+]
+
+
 if os.path.exists(instructions_path):
     with open(instructions_path, "r") as file:
         AI_instructions = file.read()
@@ -40,7 +54,7 @@ def chat():
 
     data = request.get_json()
 
-    if "api_key" not in data or "message" not in data or "history" not in data:
+    if "api_key" not in data or "message" not in data or "history" not in data or "ai_model" not in data:
         return jsonify({"error": "Invalid request data (ID: 1)"}), 400
 
     api_key = data.get('api_key', "")
@@ -53,6 +67,18 @@ def chat():
     
     if not isinstance(data["history"], list):
         return jsonify({"error": "Invalid request data (ID: 3)"}), 400
+    
+    if not isinstance(data["ai_model"], str):
+        return jsonify({"error": "Invalid request data (ID: 8)"}), 400
+    # make sure ai_model is valid
+    valid_model = False
+    for model in AI_models:
+        if model["id"] == data["ai_model"]:
+            valid_model = True
+            break
+    if not valid_model:
+        return jsonify({"error": "Invalid request data (ID: 9)"}), 400
+    
     # history must be formatted [{"role":"users/system", "message":"message"}]
     for item in data["history"]:
         if not isinstance(item, dict):
@@ -84,8 +110,7 @@ def chat():
 
         try:
             response = client.chat.completions.create(
-                #model="gemini-2.0-flash",#gemini-2.0-flash-exp,
-                model="gemini-2.0-pro-exp-02-05",
+                model=data["ai_model"],
                 messages=messages,
                 stream=True
             )
@@ -127,6 +152,11 @@ def chat():
 @app.route("/chat", methods=["GET"])
 def chat_fail():
     return jsonify({"error": "Incorrect request method"}), 405
+
+@app.route("/AI_models", methods=["GET"])
+def get_ai_models():
+    return jsonify(AI_models)
+
 
 #@app.route("/main.css", methods=["GET"])
 #def css():
