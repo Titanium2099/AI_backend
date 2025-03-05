@@ -29,11 +29,27 @@ AI_models = [
     {
         "display_name": "Gemini 2.0 Pro",
         "id": "gemini-2.0-pro-exp-02-05",
+        "baseURL": "https://generativelanguage.googleapis.com/v1beta/openai/",
+        "API_KEY_TYPE": "gemini"
     },
     {
         "display_name": "Gemini 2.0 Flash",
         "id": "gemini-2.0-flash",
-        "default": True
+        "default": True,
+        "baseURL": "https://generativelanguage.googleapis.com/v1beta/openai/",
+        "API_KEY_TYPE": "gemini"
+    },
+    {
+        "display_name": "DeepSeek V3",
+        "id":"deepseek/deepseek-chat:free",
+        "baseURL":"https://openrouter.ai/api/v1",
+        "API_KEY_TYPE": "openrouter"
+    },
+    {
+        "display_name": "Deepseek R1",
+        "id": "deepseek/deepseek-r1:free",
+        "baseURL": "https://openrouter.ai/api/v1",
+        "API_KEY_TYPE": "openrouter"
     }
 ]
 
@@ -72,9 +88,11 @@ def chat():
         return jsonify({"error": "Invalid request data (ID: 8)"}), 400
     # make sure ai_model is valid
     valid_model = False
+    model_url = ""
     for model in AI_models:
         if model["id"] == data["ai_model"]:
             valid_model = True
+            model_url = model["baseURL"]
             break
     if not valid_model:
         return jsonify({"error": "Invalid request data (ID: 9)"}), 400
@@ -92,7 +110,7 @@ def chat():
     
     client = OpenAI(
         api_key=api_key,
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        base_url=model_url
     )
 
 
@@ -144,7 +162,7 @@ def chat():
                 yield "An unknown error occurred (ID: 3)"
                 print(f"Exception: {e}")
         except Exception as e:  # Catches any other general errors
-            yield f"AN UNKNOWN ERROR OCCURRED (ID: 4)"
+            yield f"{e}"
             print(f"Exception: {e}")
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
@@ -155,7 +173,9 @@ def chat_fail():
 
 @app.route("/AI_models", methods=["GET"])
 def get_ai_models():
-    return jsonify(AI_models)
+    #return jsonify(AI_models)
+    #only return the display_name, id and default values
+    return jsonify([{"display_name": model["display_name"], "id": model["id"], "default": model.get("default", False),"API_KEY_TYPE":model["API_KEY_TYPE"]} for model in AI_models])
 
 
 #@app.route("/main.css", methods=["GET"])

@@ -288,8 +288,15 @@
     -moz-appearance: none;
     background: transparent;
     border: 1px;  
+    width: 100px;
 }
 
+#infoAboutAIModels {
+    width: 16px;
+    margin-left: 5px;
+    cursor: pointer;
+    color: #7b7665;
+}
 .AI_selector select::-ms-expand {
     display: none;
 }
