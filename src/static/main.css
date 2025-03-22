@@ -230,6 +230,7 @@
 
 .bottomBar{
     display: flex ;
+    overflow-x: auto;
 }
 
 .attachedFile {
@@ -241,8 +242,13 @@
     padding: 5px;
     width: fit-content;
     margin-left: 10px;
+    min-width: fit-content;
 }
 
+#AATUCEB_CB{
+    margin-right: 5px;
+    height: 16px;
+}
 .attachedFile .svg {
     height: 16px;
     color: #87bcde
@@ -272,7 +278,8 @@
     display: flex;
     margin-top: 10px;
     padding: 5px;
-    width: fit-content
+    width: fit-content;
+    min-width: fit-content
 }
 
 .AI_selector .svg {
@@ -289,6 +296,35 @@
     background: transparent;
     border: 1px;  
     width: 100px;
+}
+
+.attachedFile select{
+    font-size: 11px;
+    color: #7b7665;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    border: 1px;
+}
+
+.attachedFile select::-ms-expand {
+    display: none;
+}
+
+.attachedFile select:hover {
+    background: transparent;
+    outline: none;
+}
+.attachedFile select:focus {
+    background: transparent;
+    outline: none;
+}
+
+.attachedFile .arrow{
+    width: 9px;
+    height: 9px;
+    margin: auto;
+    margin-left: 5px;
 }
 
 #infoAboutAIModels {
